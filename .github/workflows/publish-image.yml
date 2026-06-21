@@ -1,106 +1,122 @@
 name: Publish Image
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+push:
+branches:
+- main
+workflow_dispatch:
 
 permissions:
-  contents: read
-  id-token: write
+contents: read
+id-token: write
 
 env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_REGION: us-east-1
-  ECR_REGISTRY: public.ecr.aws
-  IMAGE_NAME: b6x6o4z7/sun-pub
+AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+AWS_REGION: us-east-1
+ECR_REGISTRY: public.ecr.aws
+IMAGE_NAME: b6x6o4z7/sun-pub
 
 jobs:
-  build-and-publish:
-    name: build-and-publish
-    runs-on: ubuntu-latest
+build-and-publish:
+name: build-and-publish
+runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+```
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v4
 
-      - name: Validate AWS credentials
-        run: |
-          set -euo pipefail
+  - name: Validate AWS credentials
+    run: |
+      set -euo pipefail
 
-          for key in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
-            if [ -z "${!key:-}" ]; then
-              echo "❌ Missing AWS credential: $key"
-              exit 1
-            fi
-          done
+      for key in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
+        if [ -z "${!key:-}" ]; then
+          echo "❌ Missing AWS credential: $key"
+          exit 1
+        fi
+      done
 
-          echo "✅ AWS credentials validated successfully"
+      echo "✅ AWS credentials validated successfully"
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+  - name: Configure AWS credentials
+    uses: aws-actions/configure-aws-credentials@v4
+    with:
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      aws-region: us-east-1
 
-      - name: Login to Amazon ECR Public
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          registry-type: public
+  - name: Login to Amazon ECR Public
+    uses: aws-actions/amazon-ecr-login@v2
+    with:
+      registry-type: public
 
-      - name: Set image tag
-        id: image-tag
-        run: |
-          set -euo pipefail
+  - name: Set image tag
+    id: image-tag
+    run: |
+      set -euo pipefail
 
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+      SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
 
-          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
-            IMAGE_TAG="sha-${SHORT_SHA}"
-          else
-            IMAGE_TAG="${SHORT_SHA}"
-          fi
+      if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+        IMAGE_TAG="sha-${SHORT_SHA}"
+      else
+        IMAGE_TAG="${SHORT_SHA}"
+      fi
 
-          echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+      echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
 
-      - name: Build Docker image
-        run: |
-          set -euo pipefail
+  - name: Debug repository structure
+    run: |
+      pwd
+      echo "===== ROOT ====="
+      ls -la
 
-          IMAGE_URI="${ECR_REGISTRY}/${IMAGE_NAME}:${{ steps.image-tag.outputs.image_tag }}"
+      echo "===== DOCKER DIR ====="
+      ls -la docker || true
 
-          echo "🏗️ Building using docker/app.Dockerfile"
+      echo "===== FIND DOCKERFILES ====="
+      find . -name "*Dockerfile*" -type f
 
-          docker build \
-            -f docker/app.Dockerfile \
-            -t "$IMAGE_URI" \
-            .
+  - name: Build Docker image
+    run: |
+      set -euo pipefail
 
-          docker tag "$IMAGE_URI" "${ECR_REGISTRY}/${IMAGE_NAME}:latest"
+      IMAGE_URI="${ECR_REGISTRY}/${IMAGE_NAME}:${{ steps.image-tag.outputs.image_tag }}"
 
-          echo "✅ Build completed"
+      echo "🏗️ Building using docker/app.Dockerfile"
 
-      - name: Push to ECR Public
-        run: |
-          set -euo pipefail
+      test -f docker/app.Dockerfile
 
-          IMAGE_URI="${ECR_REGISTRY}/${IMAGE_NAME}:${{ steps.image-tag.outputs.image_tag }}"
+      docker build \
+        --file docker/app.Dockerfile \
+        --tag "$IMAGE_URI" \
+        .
 
-          echo "📤 Pushing $IMAGE_URI"
+      docker tag "$IMAGE_URI" "${ECR_REGISTRY}/${IMAGE_NAME}:latest"
 
-          docker push "$IMAGE_URI"
-          docker push "${ECR_REGISTRY}/${IMAGE_NAME}:latest"
+      echo "✅ Build completed"
 
-          echo "✅ Push completed"
+  - name: Push to ECR Public
+    run: |
+      set -euo pipefail
 
-      - name: Output image info
-        run: |
-          echo "===================================="
-          echo "✅ IMAGE PUBLISHED SUCCESSFULLY"
-          echo "Repo: ${ECR_REGISTRY}/${IMAGE_NAME}"
-          echo "Tag: ${{ steps.image-tag.outputs.image_tag }}"
-          echo "Dockerfile: docker/app.Dockerfile"
-          echo "===================================="
+      IMAGE_URI="${ECR_REGISTRY}/${IMAGE_NAME}:${{ steps.image-tag.outputs.image_tag }}"
+
+      echo "📤 Pushing $IMAGE_URI"
+
+      docker push "$IMAGE_URI"
+      docker push "${ECR_REGISTRY}/${IMAGE_NAME}:latest"
+
+      echo "✅ Push completed"
+
+  - name: Output image info
+    run: |
+      echo "===================================="
+      echo "✅ IMAGE PUBLISHED SUCCESSFULLY"
+      echo "Repo: ${ECR_REGISTRY}/${IMAGE_NAME}"
+      echo "Tag: ${{ steps.image-tag.outputs.image_tag }}"
+      echo "Dockerfile: docker/app.Dockerfile"
+      echo "===================================="
+```
