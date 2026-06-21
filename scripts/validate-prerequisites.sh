@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 EXIT_CODE=0
-MIN_NODE_MAJOR=20
+MIN_NODE_MAJOR=24
 
 pass() {
   printf '[PASS] %s\n' "$1"

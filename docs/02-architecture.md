@@ -408,7 +408,7 @@ Trade-off:
 Important dependencies include:
 
 - Docker Engine and Docker Compose
-- Node.js 20 for app test and validation workflows
+- Node.js 24 LTS for app test and validation workflows
 - GitHub Actions for CI/CD
 - ACR for the published image path
 - Azure Key Vault as the preferred runtime secret source

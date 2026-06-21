@@ -105,9 +105,9 @@ These workflow names reflect the earlier CI/CD shape at the time of that validat
 #### 9. The prerequisite validator accepted an unsupported Node.js version
 
 - symptom: the VM passed `scripts/validate-prerequisites.sh` with Node.js `v18.19.1`
-- root cause: the script checked that Node existed, but did not enforce the documented Node.js 20 baseline
+- root cause: the script checked that Node existed, but did not enforce the documented Node.js baseline
 - impact: a trainee could pass preflight and hit avoidable warnings or edge cases later
-- status: fixed by enforcing Node.js 20 or later in the prerequisite validator
+- status: fixed by enforcing the documented Node.js LTS baseline in the prerequisite validator
 
 #### 10. A fresh VM clone path can fail if the GitHub repository is not accessible from the VM
 
