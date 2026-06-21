@@ -113,7 +113,8 @@ Every team must explain one full chain:
 Re-run the milestone validators for the part of the journey you want to confirm:
 
 ```bash
-bash scripts/validate-local-stack.sh
+bash scripts/validate-local-stack.sh foundation
+bash scripts/validate-local-stack.sh full
 bash scripts/validate-observability.sh
 bash scripts/validate-project.sh
 ```

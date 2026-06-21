@@ -154,6 +154,12 @@ validate_required_values() {
     fi
   done
 
+  if [[ "${APP_IMAGE:-}" == TODO-set-your-registry-login-server/* ]]; then
+    echo "Training gap VM-01: replace APP_IMAGE in .env with your real registry image path."
+    echo "Start from deploy/example.env, then update APP_IMAGE before running deploy/deploy.sh."
+    missing=1
+  fi
+
   if [[ "${missing}" -eq 1 ]]; then
     echo "Update ${ENV_FILE}, ${SECRETS_FILE}, or the calling environment and try again."
     exit 1

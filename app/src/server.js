@@ -228,41 +228,17 @@ function createApp(deps = {}) {
   });
 
   app.get("/cache-demo", async (_req, res, next) => {
-    const cacheKey = "cache-demo:message";
+    logger.warn("training gap: cache demo is not implemented yet", {
+      request_id: _req.requestId,
+      gap_id: "APP-01",
+      route: "/cache-demo"
+    });
 
-    try {
-      const cached = await cache.get(cacheKey);
-
-      if (cached) {
-        logger.info("redis cache hit", {
-          request_id: _req.requestId,
-          cache_key: cacheKey
-        });
-        return res.json({
-          source: "redis-cache",
-          value: JSON.parse(cached)
-        });
-      }
-
-      const value = {
-        message: "Fresh value from the app",
-        cached_at: new Date().toISOString()
-      };
-
-      await cache.setEx(cacheKey, 60, JSON.stringify(value));
-
-      logger.info("redis cache miss", {
-        request_id: _req.requestId,
-        cache_key: cacheKey
-      });
-
-      return res.json({
-        source: "app-generated",
-        value
-      });
-    } catch (error) {
-      return next(error);
-    }
+    return res.status(501).json({
+      error: "Training gap APP-01: implement the Redis cache demo route.",
+      next_step: "Read docs/13-trainee-gap-map.md and complete the APP-01 instructions.",
+      request_id: _req.requestId
+    });
   });
 
   app.get("/slow", async (_req, res) => {

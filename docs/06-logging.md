@@ -42,6 +42,11 @@ Starter queries:
 {service="nginx", log_type="error"}
 ```
 
+In the trainee-facing version, Grafana Explore becomes fully useful only after:
+
+- `OBS-02` restores the app log path into Promtail
+- `OBS-03` restores the Loki datasource in Grafana
+
 ### CLI Logs
 
 Use:
@@ -86,6 +91,8 @@ That is enough to correlate:
 - Nginx traffic
 - app handling
 - the same request ID between GUI output and app logs
+
+In the trainee-facing version, that full path is intentionally incomplete until the guided observability gaps are finished.
 
 ## What A Full Request Investigation Looks Like
 
@@ -142,6 +149,8 @@ Use:
 3. Nginx access log
 4. Grafana Explore
 5. `bash scripts/validate-observability.sh`
+
+If the trainee-facing placeholders are still present, treat that validator failure as the expected signal to finish `OBS-01`, `OBS-02`, and `OBS-03`.
 
 ## Next Step
 

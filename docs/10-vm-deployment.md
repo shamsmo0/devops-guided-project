@@ -21,6 +21,9 @@ Use these files:
 - `.env` from `deploy/example.env`
 - `.env.secrets` from `deploy/example.secrets.env` only when you are not using Azure Key Vault or GitHub Secrets fallback
 
+In the trainee-facing version, `deploy/example.env` intentionally contains guided gap `VM-01`.
+Students must replace the placeholder `APP_IMAGE` value before expecting VM deployment to succeed.
+
 `deploy/deploy.sh` uses `.env` for the stable runtime settings and `.env.secrets` for sensitive values such as:
 
 - `POSTGRES_PASSWORD`
@@ -107,6 +110,9 @@ That validation confirms:
 - `/version` deployment metadata
 
 The `/version` response should match the published image metadata so students can trace the running VM back to a commit and image tag.
+
+In the trainee-facing version, run this only after `VM-01` is complete.
+Before that, the deployment path is expected to stop on the guided placeholder rather than pull an image successfully.
 
 If you used the same Linux machine earlier for the local training stack, stop that stack before the VM deployment path so ports `80`, `3000`, and `9090` are free for the VM runtime layout:
 

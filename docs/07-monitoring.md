@@ -6,6 +6,9 @@ This project uses:
 - Grafana for dashboards
 - Grafana Explore for logs from Loki
 
+In the trainee-facing version, the Prometheus app scrape target, the Promtail app log path, and the Grafana Loki datasource are intentionally left as guided observability gaps.
+Students should complete those before expecting full dashboards and full app logs in Grafana.
+
 ## Metrics Teach One Kind of Truth
 
 Metrics answer questions like:

@@ -21,6 +21,8 @@ If Docker is already running on Linux but `docker ps` still fails, add your user
 - check Redis logs
 - check app logs
 
+If `/ready` succeeds but `Test Redis Cache` still fails in the trainee-facing version, check whether `APP-01` is still unfinished.
+
 ## Grafana Has No Data
 
 - wait 15 to 30 seconds
@@ -28,11 +30,15 @@ If Docker is already running on Linux but `docker ps` still fails, add your user
 - check `docker compose logs grafana --tail=50`
 - check `docker compose logs promtail --tail=50`
 
+Also check whether guided gaps `OBS-01`, `OBS-02`, or `OBS-03` are still unfinished.
+
 ## Loki Logs Missing
 
 - check `docker compose logs promtail --tail=50`
 - check that `logs/app/app.log` exists
 - check that `logs/nginx/access.log` exists
+- check whether `monitoring/promtail/promtail-config.yml` still contains the `OBS-02` placeholder
+- check whether `monitoring/grafana/provisioning/datasources/datasources.yml` still contains the `OBS-03` placeholder
 
 ## GitHub Actions Build Fails
 
@@ -44,6 +50,8 @@ If Docker is already running on Linux but `docker ps` still fails, add your user
   - `test-and-validate`
   - `dependency-scan`
   - `workflow-and-compose-check`
+
+If `Publish Image` stops on the guided image-name guard, complete `CICD-01` first.
 
 ## VM Deploy Fails
 
@@ -63,6 +71,8 @@ If the GitHub-hosted deploy workflow fails before the SSH connection starts:
 - if you stored `VM_SSH_KEY` instead, make sure the secret contains the full multi-line private key text
 - confirm the `production` environment approval was granted if the workflow is waiting
 - rerun the workflow and check whether the failure happened during key validation or during the SSH connection step
+
+If the deploy script fails immediately on the image path placeholder, complete `VM-01` first.
 
 ## Observability Shortcut Confusion
 

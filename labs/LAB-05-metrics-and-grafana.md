@@ -11,6 +11,7 @@ Logs explain one request. Metrics help students see patterns across many request
 ## Before You Start
 
 Complete LAB-04 first so students already know how to inspect the same events in logs.
+In the trainee-facing version, confirm `OBS-01` is complete before expecting Prometheus-backed panels to move correctly.
 
 Open Grafana before starting this lab.
 

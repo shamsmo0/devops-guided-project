@@ -79,6 +79,9 @@ What students should notice:
 - `/cache-demo` is the clearest Redis teaching route
 - `/ready` also checks Redis connectivity
 
+In the trainee-facing version, `/cache-demo` starts as guided gap `APP-01`.
+That means Redis is present in the stack, but the trainee must finish the app route before the full cache behavior appears.
+
 ### Prometheus
 
 Role:
@@ -101,6 +104,8 @@ What students should notice:
 - Loki helps correlate request-level events
 - this course intentionally keeps Loki scope narrow
 
+In the trainee-facing version, Loki integration is intentionally incomplete until `OBS-02` and `OBS-03` are finished.
+
 ### Promtail
 
 Role:
@@ -111,6 +116,8 @@ What students should notice:
 
 - Promtail is glue, not a troubleshooting UI
 - if logs are missing in Grafana, Promtail is one of the first places to check
+
+In the trainee-facing version, the app log shipping path starts as guided gap `OBS-02`.
 
 ### Grafana
 
@@ -124,6 +131,8 @@ What students should notice:
 
 - dashboards answer “did something change?”
 - Explore answers “which request changed and why?”
+
+In the trainee-facing version, the Loki datasource starts as guided gap `OBS-03`.
 
 ## Request Flow Examples
 
@@ -209,6 +218,10 @@ Validation:
 - first response shows app-generated source
 - second response shows cache source
 - app logs show `redis cache miss` or `redis cache hit`
+
+Trainee note:
+
+- in the trainee-facing version, this full route behavior appears only after completing `APP-01`
 
 ### `GET /slow`
 
@@ -313,10 +326,12 @@ Use these checkpoints:
 
 - `bash scripts/validate-prerequisites.sh`
   - proves the workstation is ready
-- `bash scripts/validate-local-stack.sh`
-  - proves the local stack and core app routes work
+- `bash scripts/validate-local-stack.sh foundation`
+  - proves the local foundation stack and core routes except the intentional guided gaps
+- `bash scripts/validate-local-stack.sh full`
+  - proves the local stack including `APP-01`
 - `bash scripts/validate-observability.sh`
-  - proves metrics and logging are wired
+  - proves the observability gaps are completed and metrics plus logging are wired
 - `bash scripts/validate-vm-deployment.sh http://YOUR_VM_OR_LOCAL_URL`
   - proves the deployed runtime is healthy
 - `bash scripts/validate-project.sh`

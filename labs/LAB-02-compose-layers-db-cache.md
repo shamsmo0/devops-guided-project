@@ -12,6 +12,8 @@ Students already know the app responds. Now they need to see that a real service
 
 Keep the local stack running from LAB-01.
 
+Before expecting the Redis cache button to work, complete guided gap `APP-01` from [Trainee Gap Map](../docs/13-trainee-gap-map.md).
+
 If the stack was stopped, restart it:
 
 ```bash
@@ -77,14 +79,14 @@ Ask teams to explain one request that touched PostgreSQL and one that touched Re
 Re-run:
 
 ```bash
-bash scripts/validate-local-stack.sh
+bash scripts/validate-local-stack.sh full
 ```
 
 ## Known Good End State
 
 - Running: `postgres` and `redis` are healthy and the app remains healthy.
 - Endpoint: `http://localhost:8080/ready` returns `db_ready` and `redis_ready`.
-- Confirm with: `bash scripts/validate-local-stack.sh`
+- Confirm with: `bash scripts/validate-local-stack.sh full`
 - Expected logs: `docker compose logs postgres --tail=20` and `docker compose logs redis --tail=20` show recent activity after GUI actions.
 - Common failure: students click before PostgreSQL or Redis is fully healthy.
 - Safe retry: wait for `docker compose ps`, then rerun `Load Items`, `Test Redis Cache`, and `Check Readiness`

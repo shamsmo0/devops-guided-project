@@ -16,7 +16,7 @@ scrape_configs:
         labels:
           job: app
           service: app
-          __path__: /var/log/project/app/*.log
+          __path__: /var/log/project/app/TODO-app-log-path.log
 
   - job_name: nginx-access
     static_configs:

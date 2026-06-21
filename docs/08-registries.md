@@ -1,6 +1,9 @@
 # Registries
 
-This project fully implements **Azure Container Registry (ACR)**.
+In the trainee-facing version, the publish workflow intentionally contains guided gap `CICD-01`.
+Students must replace the TODO image name in `.github/workflows/publish-image.yml` so the workflow pushes the intended app image path.
+
+This project uses **Azure Container Registry (ACR)** as the implemented main registry path.
 
 Other registries are documented for comparison only.
 
@@ -47,6 +50,10 @@ Student verification:
 
 - check the `Publish Image` workflow logs for the final image names
 - check the ACR repository tags for `latest` and `sha-<short-sha>`
+
+Trainee note:
+
+- before `CICD-01` is complete, the workflow should stop on the guided image-name guard instead of silently publishing to the wrong path
 
 Login example:
 

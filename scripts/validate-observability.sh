@@ -35,6 +35,18 @@ else
   exit "${EXIT_CODE}"
 fi
 
+if grep -Fq 'TODO_APP_PORT' "${PROJECT_DIR}/monitoring/prometheus/prometheus.yml"; then
+  fail "Prometheus scrape target still contains the OBS-01 placeholder."
+fi
+
+if grep -Fq 'TODO-app-log-path.log' "${PROJECT_DIR}/monitoring/promtail/promtail-config.yml"; then
+  fail "Promtail app log path still contains the OBS-02 placeholder."
+fi
+
+if grep -Fq 'http://TODO-loki:3100' "${PROJECT_DIR}/monitoring/grafana/provisioning/datasources/datasources.yml"; then
+  fail "Grafana Loki datasource still contains the OBS-03 placeholder."
+fi
+
 curl -fsS "${APP_URL}/health" >/dev/null || {
   fail "Could not generate /health traffic."
   echo "Confirm the app is reachable at ${APP_URL} before validating observability."

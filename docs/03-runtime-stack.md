@@ -32,6 +32,13 @@ What the app does:
 - connects to PostgreSQL for item storage
 - connects to Redis for the cache demo
 
+In the trainee-facing version, some of that runtime behavior is intentionally incomplete at first:
+
+- `APP-01` leaves the Redis cache demo route unfinished
+- `OBS-01`, `OBS-02`, and `OBS-03` leave parts of the full observability path unfinished
+
+Use [13-trainee-gap-map](13-trainee-gap-map.md) when you want to understand which runtime pieces are intentionally missing in the starter version.
+
 Why this app is intentionally small:
 
 - students should spend time on runtime and delivery behavior

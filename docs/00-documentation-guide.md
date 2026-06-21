@@ -6,6 +6,7 @@ Use it when you are new to the repository and want to understand what to read fi
 
 ## 1. Before You Start
 
+- this repository is the guided training version
 - create your own repository from the public template first
 - do not run the labs directly in the shared template repository
 - [Prerequisites and Validation](01-prerequisites-and-validation.md)
@@ -54,12 +55,20 @@ Keep this open during LAB-08 and during instructor checkpoints.
 Use this after a full dry run.
 It captures real friction points found while following the project like a student.
 
+## 7. Fill The Guided Gaps
+
+- [Trainee Gap Map](13-trainee-gap-map.md)
+
+Use this before you start editing the trainee version.
+It explains which parts are intentionally incomplete and which file each team should change first.
+
 ## Milestone Validation Scripts
 
 Run these at the matching points in the journey:
 
 - `bash scripts/validate-prerequisites.sh`
-- `bash scripts/validate-local-stack.sh`
+- `bash scripts/validate-local-stack.sh foundation`
+- `bash scripts/validate-local-stack.sh full`
 - `bash scripts/validate-observability.sh`
 - `bash scripts/validate-vm-deployment.sh http://YOUR_VM_OR_LOCAL_URL`
 - `bash scripts/validate-runtime-contract.sh local`

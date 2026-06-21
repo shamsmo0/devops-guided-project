@@ -46,7 +46,7 @@ After the containers start, check service state:
 
 ```bash
 docker compose ps
-bash scripts/validate-local-stack.sh
+bash scripts/validate-local-stack.sh foundation
 ```
 
 ## What To Do
@@ -94,14 +94,14 @@ Each team should show the GUI, explain the difference between `/health` and `/ve
 Run:
 
 ```bash
-bash scripts/validate-local-stack.sh
+bash scripts/validate-local-stack.sh foundation
 ```
 
 ## Known Good End State
 
 - Running: `postgres`, `redis`, `app`, and `nginx` are healthy in `docker compose ps`.
 - Endpoint: `http://localhost:8080/health` returns a healthy JSON response.
-- Confirm with: `bash scripts/validate-local-stack.sh`
+- Confirm with: `bash scripts/validate-local-stack.sh foundation`
 - Expected logs: `docker compose logs nginx --tail=20` shows `GET /health` after the GUI check.
 - Common failure: Docker is not running or `.env` is missing.
 - Safe retry: `bash scripts/reset-local-lab.sh --yes` then `cp .env.example .env && docker compose up --build`

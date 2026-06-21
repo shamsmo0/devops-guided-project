@@ -65,6 +65,7 @@ for path in \
   "app/package-lock.json" \
   "scripts/validate-prerequisites.sh" \
   "scripts/validate-local-stack.sh" \
+  "scripts/validate-gui-requests.sh" \
   "scripts/validate-observability.sh" \
   "scripts/validate-vm-deployment.sh" \
   "scripts/validate-doc-journey.sh" \

@@ -19,6 +19,7 @@ Make sure these are ready:
 - the required secrets path, using Azure Key Vault or the documented fallback
 
 Read [VM Deployment](../docs/10-vm-deployment.md) before starting the commands.
+In the trainee-facing version, complete guided gap `VM-01` from [Trainee Gap Map](../docs/13-trainee-gap-map.md) before expecting `deploy/deploy.sh` to pull the correct image.
 
 ## Files Used
 
