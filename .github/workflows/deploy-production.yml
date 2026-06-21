@@ -6,6 +6,7 @@ on:
       - Publish Image
     types:
       - completed
+
   workflow_dispatch:
     inputs:
       image_tag:
@@ -28,22 +29,24 @@ jobs:
       (github.event_name == 'workflow_run' &&
        github.event.workflow_run.conclusion == 'success' &&
        github.event.workflow_run.head_branch == 'main')
+
     runs-on: ubuntu-latest
+
     environment:
       name: production
+
     env:
       # AWS Credentials
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
-      
+
       # VM Configuration
       VM_HOST: ${{ secrets.VM_HOST }}
       VM_USER: ${{ secrets.VM_USER }}
       VM_APP_DIR: ${{ secrets.VM_APP_DIR }}
       VM_SSH_KEY: ${{ secrets.VM_SSH_KEY }}
-      VM_SSH_KEY_B64: ${{ secrets.VM_SSH_KEY_B64 }}
 
     steps:
       - name: Select image tag
@@ -76,15 +79,12 @@ jobs:
 
           if [ "${missing}" -eq 1 ]; then
             echo "Please provide all required AWS credentials in GitHub Secrets."
-            echo "Required: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ACCOUNT_ID, AWS_REGION"
             exit 1
           fi
 
           echo "✅ AWS credentials validated successfully."
-          echo "AWS Account ID: ${AWS_ACCOUNT_ID}"
-          echo "AWS Region: ${AWS_REGION}"
 
-      - name: Load runtime secrets from GitHub Secrets
+      - name: Load runtime secrets
         env:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
@@ -102,50 +102,25 @@ jobs:
             fi
           done
 
-      - name: Validate deployment secret availability
+      - name: Validate VM settings
         run: |
           set -euo pipefail
 
           missing=0
 
-          for key in POSTGRES_PASSWORD GRAFANA_ADMIN_PASSWORD; do
+          for key in VM_HOST VM_USER VM_APP_DIR VM_SSH_KEY; do
             if [ -z "${!key:-}" ]; then
-              echo "❌ Missing required deployment secret: ${key}"
+              echo "❌ Missing VM setting: ${key}"
               missing=1
             fi
           done
 
           if [ "${missing}" -eq 1 ]; then
-            echo "Please add the missing secrets to GitHub Secrets."
+            echo "Please add missing VM secrets."
             exit 1
           fi
 
-          echo "✅ All required deployment secrets are available."
-
-      - name: Validate VM connection settings
-        run: |
-          set -euo pipefail
-
-          missing=0
-
-          for key in VM_HOST VM_USER VM_APP_DIR; do
-            if [ -z "${!key:-}" ]; then
-              echo "❌ Missing required VM setting: ${key}"
-              missing=1
-            fi
-          done
-
-          if [ -z "${VM_SSH_KEY_B64:-}" ] && [ -z "${VM_SSH_KEY:-}" ]; then
-            echo "❌ Missing VM SSH key. Set VM_SSH_KEY_B64 or VM_SSH_KEY in GitHub Secrets."
-            missing=1
-          fi
-
-          if [ "${missing}" -eq 1 ]; then
-            echo "Please add the missing VM settings in GitHub Secrets before running Deploy Production."
-            exit 1
-          fi
-
-          echo "✅ VM connection settings validated successfully."
+          echo "✅ VM settings validated."
 
       - name: Deploy selected tag to VM
         env:
@@ -169,15 +144,10 @@ jobs:
           key_file="${RUNNER_TEMP}/vm-deploy-key.pem"
           ssh_config_file="${RUNNER_TEMP}/vm-ssh-config"
 
-          if [ -n "${VM_SSH_KEY_B64:-}" ]; then
-            printf '%s' "${VM_SSH_KEY_B64}" | tr -d '\r\n' | base64 --decode > "${key_file}"
-            echo "✅ Loaded VM SSH key from VM_SSH_KEY_B64."
-          else
-            printf '%s\n' "${VM_SSH_KEY}" | sed 's/\r$//' > "${key_file}"
-            echo "✅ Loaded VM SSH key from VM_SSH_KEY."
-          fi
-
+          # ✅ Use raw SSH key مباشرة (NO base64)
+          printf '%s\n' "${VM_SSH_KEY}" > "${key_file}"
           chmod 600 "${key_file}"
+
           ssh-keygen -y -f "${key_file}" >/dev/null
 
           cat > "${ssh_config_file}" <<EOF
@@ -189,10 +159,10 @@ jobs:
             UserKnownHostsFile /dev/null
           EOF
 
-          echo "🔌 Testing SSH connection to ${VM_HOST}..."
-          ssh -F "${ssh_config_file}" vm-target "echo ✅ SSH connection to ${VM_HOST} succeeded."
+          echo "🔌 Testing SSH connection..."
+          ssh -F "${ssh_config_file}" vm-target "echo ✅ SSH OK"
 
-          echo "📦 Deploying image tag: ${IMAGE_TAG}"
+          echo "📦 Deploying image: ${IMAGE_TAG}"
           ssh -F "${ssh_config_file}" vm-target <<EOF
           export IMAGE_TAG='${IMAGE_TAG}'
           export POSTGRES_PASSWORD='${POSTGRES_PASSWORD}'
