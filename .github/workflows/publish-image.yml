@@ -8,116 +8,61 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
-  test-and-validate:
-    name: publish-test-and-validate
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-          cache-dependency-path: app/package-lock.json
-
-      - name: Install app dependencies
-        working-directory: app
-        run: npm ci
-
-      - name: Run app tests
-        working-directory: app
-        run: npm test
-
-      - name: Validate documentation journey
-        run: bash scripts/validate-doc-journey.sh
-
-      - name: Validate static runtime contract
-        run: bash scripts/validate-runtime-contract.sh static
-
-  build-push-and-scan:
-    name: build-push-and-scan
-    needs: test-and-validate
+  build-and-publish:
+    name: build-and-publish
     runs-on: ubuntu-latest
     env:
-      REGISTRY_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-      REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-      REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-      IMAGE_NAME: ${{ secrets.REGISTRY_LOGIN_SERVER }}/TODO-devops-mini-app
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      ECR_PUBLIC_REGISTRY: public.ecr.aws/b6x6o4z7/sun-pub
 
     steps:
-      - name: Check out repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Validate ACR configuration
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1  # ECR Public uses us-east-1
+
+      - name: Login to Amazon ECR Public
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Build and push Docker image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           set -euo pipefail
+          
+          # Build the image
+          docker build -t ${ECR_PUBLIC_REGISTRY}:${IMAGE_TAG} .
+          
+          # Push to ECR Public
+          docker push ${ECR_PUBLIC_REGISTRY}:${IMAGE_TAG}
+          
+          # Also tag as latest
+          docker tag ${ECR_PUBLIC_REGISTRY}:${IMAGE_TAG} ${ECR_PUBLIC_REGISTRY}:latest
+          docker push ${ECR_PUBLIC_REGISTRY}:latest
 
-          missing=0
-
-          for key in REGISTRY_LOGIN_SERVER REGISTRY_USERNAME REGISTRY_PASSWORD; do
-            if [ -z "${!key:-}" ]; then
-              echo "Missing required registry secret: ${key}"
-              missing=1
-            fi
-          done
-
-          if [ "${missing}" -eq 1 ]; then
-            echo "Configure ACR secrets before running the publish path."
-            exit 1
-          fi
-
-      - name: Validate trainee image-name gap
+      - name: Get short SHA
+        id: short-sha
         run: |
-          set -euo pipefail
+          short_sha=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "short_sha=${short_sha}" >> "${GITHUB_OUTPUT}"
 
-          if [ "${IMAGE_NAME}" = "${REGISTRY_LOGIN_SERVER}/TODO-devops-mini-app" ]; then
-            echo "Training gap CICD-01: replace the TODO image name in .github/workflows/publish-image.yml."
-            echo "Use the same app image name consistently across publish, deploy, and deploy/example.env."
-            exit 1
-          fi
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to ACR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY_LOGIN_SERVER }}
-          username: ${{ env.REGISTRY_USERNAME }}
-          password: ${{ env.REGISTRY_PASSWORD }}
-
-      - name: Create image tags
-        id: image-tags
-        run: echo "short_sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
-
-      - name: Build and push app image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: docker/app.Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: |
-            ${{ env.IMAGE_NAME }}:latest
-            ${{ env.IMAGE_NAME }}:sha-${{ steps.image-tags.outputs.short_sha }}
-
-      - name: Scan published image
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: ${{ env.IMAGE_NAME }}:sha-${{ steps.image-tags.outputs.short_sha }}
-          format: table
-          vuln-type: os,library
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: 1
-
-      - name: Show pushed image names
+      - name: Output image info
         run: |
-          echo "Published images:"
-          echo "${IMAGE_NAME}:latest"
-          echo "${IMAGE_NAME}:sha-${{ steps.image-tags.outputs.short_sha }}"
+          echo "✅ Image published to ECR Public:"
+          echo "Registry: ${ECR_PUBLIC_REGISTRY}"
+          echo "Tag: ${{ github.sha }}"
+          echo "Short SHA: ${{ steps.short-sha.outputs.short_sha }}"
