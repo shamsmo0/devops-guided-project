@@ -37,7 +37,7 @@ jobs:
             fi
           done
 
-          echo "✅ AWS credentials OK"
+          echo "✅ AWS credentials validated successfully"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -72,16 +72,16 @@ jobs:
 
           IMAGE_URI="${ECR_REGISTRY}/${IMAGE_NAME}:${{ steps.image-tag.outputs.image_tag }}"
 
-          echo "🏗️ Building from docker/Dockerfile"
+          echo "🏗️ Building using docker/app.Dockerfile"
 
           docker build \
-            -f docker/Dockerfile \
+            -f docker/app.Dockerfile \
             -t "$IMAGE_URI" \
             .
 
           docker tag "$IMAGE_URI" "${ECR_REGISTRY}/${IMAGE_NAME}:latest"
 
-          echo "✅ Build done"
+          echo "✅ Build completed"
 
       - name: Push to ECR Public
         run: |
@@ -102,4 +102,5 @@ jobs:
           echo "✅ IMAGE PUBLISHED SUCCESSFULLY"
           echo "Repo: ${ECR_REGISTRY}/${IMAGE_NAME}"
           echo "Tag: ${{ steps.image-tag.outputs.image_tag }}"
+          echo "Dockerfile: docker/app.Dockerfile"
           echo "===================================="
