@@ -10,7 +10,7 @@ Make sure the trainee laptop is ready before the guided project starts.
 
 - Docker Engine with the Docker Compose v2 plugin
 - Git
-- Node.js 20 or later
+- Node.js 24 LTS or later
 - npm
 - curl
 
@@ -27,14 +27,14 @@ Use:
 
 1. Docker Desktop
 2. Git
-3. Node.js 20 LTS
+3. Node.js 24 LTS
 
 Suggested steps:
 
 1. Install Docker Desktop from the official Docker site.
 2. Start Docker Desktop and wait until it reports that Docker is running.
 3. Install Git from the official Git site if it is not already available.
-4. Install Node.js 20 LTS from the official Node.js site.
+4. Install Node.js 24 LTS from the official Node.js site.
 5. Open a new terminal after installation.
 
 ### Ubuntu or other Linux distributions
@@ -45,7 +45,7 @@ Use:
 2. Docker Compose v2 plugin
 3. Git
 4. curl
-5. Node.js 20 LTS
+5. Node.js 24 LTS
 
 Recommended Ubuntu steps:
 
@@ -71,10 +71,10 @@ sudo systemctl start docker
 sudo usermod -aG docker "$USER"
 ```
 
-Install Node.js 20 LTS:
+Install Node.js 24 LTS:
 
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
@@ -91,7 +91,7 @@ bash deploy/vm-setup.sh /opt/devops-guided-project
 That script:
 
 - installs Docker if needed
-- installs `git`, `jq`, and Node.js 20 LTS if needed
+- installs `git`, `jq`, and Node.js 24 LTS if needed
 - enables the Docker service
 - prepares the project directory
 - creates log directories
@@ -124,7 +124,7 @@ Expected versions:
 
 - Docker: any recent stable version is fine
 - Docker Compose: v2
-- Node.js: `v20.x` or later
+- Node.js: `v24.x` or later
 - npm: installed with Node.js
 - Git: any recent stable version is fine
 
@@ -146,7 +146,7 @@ This script checks:
 - npm
 - curl
 
-It also checks that the installed Node.js major version is `20` or later, because the app and test flow are written against that baseline.
+It also checks that the installed Node.js major version is `24` or later, because the app and test flow are written against that baseline.
 
 If the script passes, the workstation is ready for LAB-01.
 
@@ -156,10 +156,10 @@ If the script passes, the workstation is ready for LAB-01.
 - if `docker ps` fails, start Docker Desktop or the Docker service
 - on Linux, if Docker is running but `docker ps` still fails, add your user to the `docker` group and start a new shell
 - on Linux, if Docker starts working only after `deploy/vm-setup.sh`, reconnect your SSH session before rerunning the script
-- if `node --version` fails, install Node.js 20 or later
-- if `node --version` shows `v18.x` or older, upgrade to Node.js 20 LTS before continuing
+- if `node --version` fails, install Node.js 24 LTS or later
+- if `node --version` shows `v22.x` or older, upgrade to Node.js 24 LTS before continuing
 - if `curl --version` fails, install curl
-- if `npm --version` fails but `node --version` works, reinstall Node.js 20 LTS cleanly
+- if `npm --version` fails but `node --version` works, reinstall Node.js 24 LTS cleanly
 
 ## Why These Tools Matter Here
 

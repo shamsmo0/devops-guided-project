@@ -23,4 +23,4 @@ npm ci
 npm test
 ```
 
-If `npm test` fails because `node` is not installed, install Node.js 20 or later first.
+If `npm test` fails because `node` is not installed, install Node.js 24 LTS or later first.
