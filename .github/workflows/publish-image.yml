@@ -10,59 +10,97 @@ permissions:
   contents: read
   id-token: write
 
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_PUBLIC_REGISTRY: public.ecr.aws/b6x6o4z7/sun-pub
+  IMAGE_NAME: sun-pub
+
 jobs:
   build-and-publish:
     name: build-and-publish
     runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      ECR_PUBLIC_REGISTRY: public.ecr.aws/b6x6o4z7/sun-pub
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # ECR Public uses us-east-1
+      - name: Validate AWS credentials
+        run: |
+          set -euo pipefail
+          
+          missing=0
+          for key in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_ACCOUNT_ID AWS_REGION; do
+            if [ -z "${!key:-}" ]; then
+              echo "❌ Missing required AWS credential: ${key}"
+              missing=1
+            fi
+          done
+          
+          if [ "${missing}" -eq 1 ]; then
+            echo "Please provide all required AWS credentials in GitHub Secrets."
+            exit 1
+          fi
+          
+          echo "✅ AWS credentials validated successfully."
 
       - name: Login to Amazon ECR Public
-        id: login-ecr-public
         uses: aws-actions/amazon-ecr-login@v2
         with:
           registry-type: public
 
-      - name: Build and push Docker image
-        env:
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Set image tag
+        id: image-tag
         run: |
           set -euo pipefail
           
-          # Build the image
-          docker build -t ${ECR_PUBLIC_REGISTRY}:${IMAGE_TAG} .
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            # Use short SHA for manual triggers
+            SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+            IMAGE_TAG="sha-${SHORT_SHA}"
+          else
+            # Use full SHA for automated builds
+            IMAGE_TAG="${{ github.sha }}"
+          fi
           
-          # Push to ECR Public
-          docker push ${ECR_PUBLIC_REGISTRY}:${IMAGE_TAG}
-          
-          # Also tag as latest
-          docker tag ${ECR_PUBLIC_REGISTRY}:${IMAGE_TAG} ${ECR_PUBLIC_REGISTRY}:latest
-          docker push ${ECR_PUBLIC_REGISTRY}:latest
+          echo "image_tag=${IMAGE_TAG}" >> "${GITHUB_OUTPUT}"
+          echo "short_sha=$(echo "${{ github.sha }}" | cut -c1-7)" >> "${GITHUB_OUTPUT}"
+          echo "Selected image tag: ${IMAGE_TAG}"
 
-      - name: Get short SHA
-        id: short-sha
+      - name: Build Docker image
         run: |
-          short_sha=$(echo "${{ github.sha }}" | cut -c1-7)
-          echo "short_sha=${short_sha}" >> "${GITHUB_OUTPUT}"
+          set -euo pipefail
+          
+          echo "🏗️ Building Docker image..."
+          docker build -t ${ECR_PUBLIC_REGISTRY}:${{ steps.image-tag.outputs.image_tag }} .
+          docker tag ${ECR_PUBLIC_REGISTRY}:${{ steps.image-tag.outputs.image_tag }} ${ECR_PUBLIC_REGISTRY}:latest
+          
+          echo "✅ Image built successfully"
+
+      - name: Push to ECR Public
+        run: |
+          set -euo pipefail
+          
+          echo "📤 Pushing image to ECR Public..."
+          docker push ${ECR_PUBLIC_REGISTRY}:${{ steps.image-tag.outputs.image_tag }}
+          docker push ${ECR_PUBLIC_REGISTRY}:latest
+          
+          echo "✅ Image pushed successfully"
 
       - name: Output image info
         run: |
-          echo "✅ Image published to ECR Public:"
+          set -euo pipefail
+          
+          echo "=========================================="
+          echo "✅ Image published to ECR Public!"
+          echo "=========================================="
           echo "Registry: ${ECR_PUBLIC_REGISTRY}"
-          echo "Tag: ${{ github.sha }}"
-          echo "Short SHA: ${{ steps.short-sha.outputs.short_sha }}"
+          echo "Image Tag: ${{ steps.image-tag.outputs.image_tag }}"
+          echo "Short SHA: ${{ steps.image-tag.outputs.short_sha }}"
+          echo "Latest Tag: ${ECR_PUBLIC_REGISTRY}:latest"
+          echo "=========================================="
+          
+          # Set output for use in other workflows
+          echo "image_tag=${{ steps.image-tag.outputs.image_tag }}" >> "${GITHUB_ENV}"
