@@ -10,3 +10,4 @@ logs/nginx/*.log
 *.swp
 *.swo
 instructor/
+full-reference-local/

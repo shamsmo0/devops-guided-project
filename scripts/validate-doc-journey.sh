@@ -19,6 +19,7 @@ DOC_ORDER=(
   "10-vm-deployment.md"
   "11-troubleshooting.md"
   "12-trainee-validation-findings.md"
+  "13-trainee-gap-map.md"
 )
 
 pass() {

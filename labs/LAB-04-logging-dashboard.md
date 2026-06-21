@@ -12,6 +12,8 @@ Metrics can tell students that something changed, but logs show the exact reques
 
 Keep the local stack running.
 
+Complete guided gaps `OBS-01`, `OBS-02`, and `OBS-03` from [Trainee Gap Map](../docs/13-trainee-gap-map.md) before expecting the full Grafana and Loki path to work.
+
 Open:
 
 - the app GUI at `http://localhost:8080`
@@ -71,6 +73,7 @@ bash scripts/validate-observability.sh
 
 - Grafana Explore opens before Promtail catches up
 - `logs/app/app.log` does not exist yet because no request was sent
+- guided observability placeholders were not completed yet
 - students search only one log source and miss the full request cycle
 
 ## Team Task Split

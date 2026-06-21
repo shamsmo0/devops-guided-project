@@ -2,8 +2,16 @@
 set -Eeuo pipefail
 
 PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BASE_URL="${1:-http://localhost:8080}"
+MODE="foundation"
+BASE_URL="http://localhost:8080"
 EXIT_CODE=0
+
+if [[ "${1:-}" == "foundation" || "${1:-}" == "full" ]]; then
+  MODE="$1"
+  BASE_URL="${2:-http://localhost:8080}"
+elif [[ -n "${1:-}" ]]; then
+  BASE_URL="$1"
+fi
 
 pass() {
   printf '[PASS] %s\n' "$1"
@@ -44,7 +52,7 @@ require_json_key() {
   fi
 }
 
-echo "Validating local guided-project stack at ${BASE_URL}..."
+echo "Validating local guided-project stack in ${MODE} mode at ${BASE_URL}..."
 
 if COMPOSE_CMD="$(compose_cmd)"; then
   pass "Using Compose command: ${COMPOSE_CMD}"
@@ -114,15 +122,22 @@ else
   fail "GET /items response did not contain items."
 fi
 
-cache_json="$(http_json /cache-demo)" || {
-  fail "GET /cache-demo did not succeed."
-  cache_json=""
-}
+if [[ "${MODE}" == "full" ]]; then
+  cache_json="$(http_json /cache-demo)" || {
+    fail "GET /cache-demo did not succeed."
+    echo "If this is the trainee-facing version, complete guided gap APP-01 first."
+    cache_json=""
+  }
 
-if [[ -n "${cache_json}" ]] && require_json_key "${cache_json}" "source"; then
-  pass "GET /cache-demo returned cache data."
+  if [[ -n "${cache_json}" ]] && require_json_key "${cache_json}" "source"; then
+    pass "GET /cache-demo returned cache data."
+  else
+    fail "GET /cache-demo response did not contain source."
+  fi
 else
-  fail "GET /cache-demo response did not contain source."
+  echo "[INFO] Skipping GET /cache-demo in foundation mode."
+  echo "[INFO] Use: bash scripts/validate-local-stack.sh full"
+  echo "[INFO] Run the full mode after completing guided gap APP-01."
 fi
 
 if [[ "${EXIT_CODE}" -eq 0 ]]; then

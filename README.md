@@ -4,6 +4,10 @@ This repository is a guided, hands-on DevOps project for junior engineers. The a
 
 `design request -> local runtime -> observability -> image build -> registry publish -> VM deployment -> validation -> recovery`
 
+This tracked repository should now be treated as the trainee-facing version.
+Maintain a separate full-reference version privately for your own delivery, answer key, and validation work.
+This trainee-facing version intentionally contains guided gaps that students must complete to reach the full working implementation.
+
 ## Project Purpose
 
 Treat this repository as the response to a realistic request sent to a DevOps team:
@@ -58,10 +62,12 @@ If you are opening the repository for the first time, use this order:
 11. [VM Deployment](docs/10-vm-deployment.md)
 12. [Troubleshooting](docs/11-troubleshooting.md)
 13. [Trainee Validation Findings](docs/12-trainee-validation-findings.md)
+14. [Trainee Gap Map](docs/13-trainee-gap-map.md)
 
 ## Create Your Own Working Copy
 
 This repository is meant to be used as a public course template.
+It is the trainee-facing version, not the maintainer full-reference copy.
 
 Do not do your hands-on work directly in the shared template repository.
 
@@ -140,6 +146,7 @@ For the detailed explanation, read [Architecture](docs/02-architecture.md).
 ├── docs/                        # Ordered documentation set
 ├── labs/                        # Guided workshop labs
 ├── instructor/                  # Local instructor-only notes, not part of the public trainee template
+├── full-reference-local/        # Local ignored full-reference snapshot for maintainers only
 ├── logs/                        # Host-side app and Nginx logs
 ├── scripts/                     # Validation and helper scripts
 ├── docker-compose.yml           # Local training stack
@@ -177,7 +184,7 @@ docker compose up --build
 Then validate the local stack:
 
 ```bash
-bash scripts/validate-local-stack.sh
+bash scripts/validate-local-stack.sh foundation
 ```
 
 ## Local Usage Flow
@@ -185,7 +192,8 @@ bash scripts/validate-local-stack.sh
 1. Start the stack with `docker compose up --build`.
 2. Open the GUI at [http://localhost:8080](http://localhost:8080).
 3. Use the GUI to generate health, readiness, DB, cache, slow, and error traffic.
-4. Validate the stack with `bash scripts/validate-local-stack.sh`.
+4. Validate the base stack with `bash scripts/validate-local-stack.sh foundation`.
+5. Complete the guided gaps in [Trainee Gap Map](docs/13-trainee-gap-map.md) as you reach each lab milestone.
 5. Inspect logs in Grafana Explore or with `docker compose logs`.
 6. Inspect metrics in Grafana and Prometheus.
 7. Run `cd app && npm ci && npm test` when you need the app test path.
@@ -201,7 +209,8 @@ Local URLs:
 These scripts are part of the expected workflow, not optional extras.
 
 - `bash scripts/validate-prerequisites.sh`
-- `bash scripts/validate-local-stack.sh`
+- `bash scripts/validate-local-stack.sh foundation`
+- `bash scripts/validate-local-stack.sh full`
 - `bash scripts/validate-observability.sh`
 - `bash scripts/validate-vm-deployment.sh http://YOUR_VM_OR_LOCAL_URL`
 - `bash scripts/validate-runtime-contract.sh local`

@@ -71,7 +71,7 @@ Have one team narrate the full path of a request from browser to Nginx to the ap
 Re-run:
 
 ```bash
-bash scripts/validate-local-stack.sh
+bash scripts/validate-local-stack.sh foundation
 ```
 
 ## Known Good End State

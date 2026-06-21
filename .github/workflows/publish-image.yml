@@ -47,7 +47,7 @@ jobs:
       REGISTRY_LOGIN_SERVER: ${{ secrets.REGISTRY_LOGIN_SERVER }}
       REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
       REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-      IMAGE_NAME: ${{ secrets.REGISTRY_LOGIN_SERVER }}/devops-mini-app
+      IMAGE_NAME: ${{ secrets.REGISTRY_LOGIN_SERVER }}/TODO-devops-mini-app
 
     steps:
       - name: Check out repository
@@ -68,6 +68,16 @@ jobs:
 
           if [ "${missing}" -eq 1 ]; then
             echo "Configure ACR secrets before running the publish path."
+            exit 1
+          fi
+
+      - name: Validate trainee image-name gap
+        run: |
+          set -euo pipefail
+
+          if [ "${IMAGE_NAME}" = "${REGISTRY_LOGIN_SERVER}/TODO-devops-mini-app" ]; then
+            echo "Training gap CICD-01: replace the TODO image name in .github/workflows/publish-image.yml."
+            echo "Use the same app image name consistently across publish, deploy, and deploy/example.env."
             exit 1
           fi
 

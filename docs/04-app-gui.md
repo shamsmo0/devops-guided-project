@@ -26,6 +26,9 @@ It is a simple helper for:
 - Open Grafana Logs
 - Open Prometheus
 
+In the trainee-facing version, `Test Redis Cache` is intentionally left incomplete as guided gap `APP-01`.
+Students should restore the real Redis-backed behavior as part of the hands-on journey.
+
 ## Request Types in the GUI
 
 | Button | Route | Main Teaching Point | Dependencies |

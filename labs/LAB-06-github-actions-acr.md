@@ -17,6 +17,7 @@ Make sure students already understand:
 - why deployment should consume an image instead of rebuilding on the VM
 
 Read [Registries](../docs/08-registries.md) before or during this lab.
+In the trainee-facing version, complete guided gap `CICD-01` from [Trainee Gap Map](../docs/13-trainee-gap-map.md) before expecting `Publish Image` to succeed.
 
 ## Files Used
 
