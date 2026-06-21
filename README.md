@@ -4,9 +4,7 @@ This repository is a guided, hands-on DevOps project for junior engineers. The a
 
 `design request -> local runtime -> observability -> image build -> registry publish -> VM deployment -> validation -> recovery`
 
-This tracked repository should now be treated as the trainee-facing version.
-Maintain a separate full-reference version privately for your own delivery, answer key, and validation work.
-This trainee-facing version intentionally contains guided gaps that students must complete to reach the full working implementation.
+This training version intentionally contains guided gaps that students must complete to reach the full working implementation.
 
 ## Project Purpose
 
@@ -66,8 +64,7 @@ If you are opening the repository for the first time, use this order:
 
 ## Create Your Own Working Copy
 
-This repository is meant to be used as a public course template.
-It is the trainee-facing version, not the maintainer full-reference copy.
+This repository is meant to be used as a public course template for hands-on lab work.
 
 Do not do your hands-on work directly in the shared template repository.
 
@@ -145,8 +142,6 @@ For the detailed explanation, read [Architecture](docs/02-architecture.md).
 ├── deploy/                      # VM setup and deployment scripts
 ├── docs/                        # Ordered documentation set
 ├── labs/                        # Guided workshop labs
-├── instructor/                  # Local instructor-only notes, not part of the public trainee template
-├── full-reference-local/        # Local ignored full-reference snapshot for maintainers only
 ├── logs/                        # Host-side app and Nginx logs
 ├── scripts/                     # Validation and helper scripts
 ├── docker-compose.yml           # Local training stack

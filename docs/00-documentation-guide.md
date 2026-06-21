@@ -6,8 +6,7 @@ Use it when you are new to the repository and want to understand what to read fi
 
 ## 1. Before You Start
 
-- this tracked repository is the trainee-facing version
-- keep the fully working maintainer reference in a separate private repository or ignored local copy
+- this repository is the guided training version
 - create your own repository from the public template first
 - do not run the labs directly in the shared template repository
 - [Prerequisites and Validation](01-prerequisites-and-validation.md)

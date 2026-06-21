@@ -4,8 +4,6 @@ This repository is the trainee-facing version of the project.
 
 It intentionally includes a small number of guided gaps so students can complete meaningful work instead of only reading a finished implementation.
 
-Use the private full-reference version as the answer key.
-
 ## How To Use This File
 
 Treat each gap as a milestone.
